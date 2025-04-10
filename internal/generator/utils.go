@@ -133,3 +133,7 @@ func normalizeName(fieldName string) string {
 
 	return strings.TrimPrefix(strings.TrimPrefix(fieldName, "[]"), "*")
 }
+
+func isSlice(typeName string) bool {
+	return strings.HasPrefix(typeName, "[]")
+}

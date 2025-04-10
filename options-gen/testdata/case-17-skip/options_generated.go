@@ -11,22 +11,6 @@ var optIsSet = [1]bool{}
 
 type OptOptionsSetter func(o *Options)
 
-func NewOptions(
-	options ...OptOptionsSetter,
-) Options {
-	o := Options{}
-
-	var empty [1]bool
-	optIsSet = empty
-
-	// Setting defaults from field tag (if present)
-
-	for _, opt := range options {
-		opt(&o)
-	}
-	return o
-}
-
 func WithName(opt string) OptOptionsSetter {
 	return func(o *Options) {
 		o.name = opt

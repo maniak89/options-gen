@@ -52,6 +52,7 @@ func TestRun(t *testing.T) {
 					true,
 					params.GenerateConstructor,
 					params.PublicConstructor,
+					false,
 				)
 				assert.NoError(t, err)
 
@@ -75,6 +76,7 @@ func TestRun(t *testing.T) {
 			false,
 			true,
 			true,
+			false,
 		)
 		assert.ErrorIs(t, err, syscall.ENOENT)
 	})

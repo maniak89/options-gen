@@ -37,7 +37,7 @@ func TestGetImports(t *testing.T) {
 func TestGetOptionSpec(t *testing.T) { //nolint:funlen
 	t.Parallel()
 
-	spec, warnings, err := generator.GetOptionSpec(gofile, "TestOptions", "default")
+	spec, warnings, err := generator.GetOptionSpec(gofile, "TestOptions", "default", false)
 	req.NoError(t, err)
 	req.Equal(t, []string{
 		"Deprecated: use `option:\"mandatory\"` instead for field `oldStyleOpt1` to force the passing option in the constructor argument\n",                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              //nolint:lll
@@ -106,6 +106,13 @@ func TestGetOptionSpec(t *testing.T) { //nolint:funlen
 				TagOption: generator.TagOption{IsRequired: true, GoValidator: "", Default: ""},
 			},
 			{
+				Name:      "SliceOptVariadic",
+				Docstring: "",
+				Field:     "sliceOptVariadic",
+				Type:      "int",
+				TagOption: generator.TagOption{IsRequired: true, GoValidator: "", Default: "", Variadic: true},
+			},
+			{
 				Name:      "OldStyleOpt1",
 				Docstring: "",
 				Field:     "oldStyleOpt1",
@@ -154,7 +161,7 @@ func TestGetOptionSpec(t *testing.T) { //nolint:funlen
 func TestGetOptionSpec_Generics(t *testing.T) {
 	t.Parallel()
 
-	spec, warnings, err := generator.GetOptionSpec(gofile, "TestOptionsGen", "default")
+	spec, warnings, err := generator.GetOptionSpec(gofile, "TestOptionsGen", "default", false)
 	req.NoError(t, err)
 	req.Empty(t, warnings)
 	req.Equal(t, &generator.OptionSpec{
@@ -208,9 +215,10 @@ type TestOptions struct {
 	// line
 	//
 	// comment
-	noValidation string //nolint:unused
-	starOpt      *int   `option:"mandatory"` //nolint:unused
-	sliceOpt     []int  `option:"mandatory"` //nolint:unused
+	noValidation     string //nolint:unused
+	starOpt          *int   `option:"mandatory"`               //nolint:unused
+	sliceOpt         []int  `option:"mandatory"`               //nolint:unused
+	sliceOptVariadic []int  `option:"mandatory,variadic=true"` //nolint:unused
 
 	oldStyleOpt1 string `option:"required,not-empty"`                     //nolint:unused
 	oldStyleOpt2 string `option:"required,not-empty" validate:"required"` //nolint:unused
@@ -264,7 +272,7 @@ type TestOptionsEmbedAnotherPkgPtr struct {
 func TestGetOptionSpecInline(t *testing.T) { //nolint:funlen
 	t.Parallel()
 
-	spec, warnings, err := generator.GetOptionSpec(gofile, "TestOptionsInline", "default")
+	spec, warnings, err := generator.GetOptionSpec(gofile, "TestOptionsInline", "default", false)
 	req.NoError(t, err)
 	req.Equal(t, []string{
 		"Warning: consider to make `InlineStruct` is private. This is will not allow to users to avoid constructor method.",
@@ -285,7 +293,7 @@ func TestGetOptionSpecInline(t *testing.T) { //nolint:funlen
 func TestGetOptionSpecInlinePtr(t *testing.T) { //nolint:funlen
 	t.Parallel()
 
-	spec, warnings, err := generator.GetOptionSpec(gofile, "TestOptionsInlinePtr", "default")
+	spec, warnings, err := generator.GetOptionSpec(gofile, "TestOptionsInlinePtr", "default", false)
 	req.NoError(t, err)
 	req.Equal(t, []string{
 		"Warning: consider to make `InlineStruct` is private. This is will not allow to users to avoid constructor method.",
@@ -306,7 +314,7 @@ func TestGetOptionSpecInlinePtr(t *testing.T) { //nolint:funlen
 func TestGetOptionSpecEmbed(t *testing.T) { //nolint:funlen
 	t.Parallel()
 
-	spec, warnings, err := generator.GetOptionSpec(gofile, "TestOptionsEmbed", "default")
+	spec, warnings, err := generator.GetOptionSpec(gofile, "TestOptionsEmbed", "default", false)
 	req.NoError(t, err)
 	req.Equal(t, []string{
 		"Warning: consider to make `EmbedStruct` is private. This is will not allow to users to avoid constructor method.",
@@ -327,7 +335,7 @@ func TestGetOptionSpecEmbed(t *testing.T) { //nolint:funlen
 func TestGetOptionSpecEmbedPtr(t *testing.T) { //nolint:funlen
 	t.Parallel()
 
-	spec, warnings, err := generator.GetOptionSpec(gofile, "TestOptionsEmbedPtr", "default")
+	spec, warnings, err := generator.GetOptionSpec(gofile, "TestOptionsEmbedPtr", "default", false)
 	req.NoError(t, err)
 	req.Equal(t, []string{
 		"Warning: consider to make `EmbedStruct` is private. This is will not allow to users to avoid constructor method.",
@@ -348,7 +356,7 @@ func TestGetOptionSpecEmbedPtr(t *testing.T) { //nolint:funlen
 func TestGetOptionSpecEmbedAnotherPkg(t *testing.T) { //nolint:funlen
 	t.Parallel()
 
-	spec, warnings, err := generator.GetOptionSpec(gofile, "TestOptionsEmbedAnotherPkg", "default")
+	spec, warnings, err := generator.GetOptionSpec(gofile, "TestOptionsEmbedAnotherPkg", "default", false)
 	req.NoError(t, err)
 	req.Equal(t, []string{
 		"Warning: consider to make `StructForEmbed` is private. This is will not allow to users to avoid constructor method.",
@@ -369,7 +377,7 @@ func TestGetOptionSpecEmbedAnotherPkg(t *testing.T) { //nolint:funlen
 func TestGetOptionSpecEmbedAnotherPkgPtr(t *testing.T) { //nolint:funlen
 	t.Parallel()
 
-	spec, warnings, err := generator.GetOptionSpec(gofile, "TestOptionsEmbedAnotherPkgPtr", "default")
+	spec, warnings, err := generator.GetOptionSpec(gofile, "TestOptionsEmbedAnotherPkgPtr", "default", false)
 	req.NoError(t, err)
 	req.Equal(t, []string{
 		"Warning: consider to make `StructForEmbed` is private. This is will not allow to users to avoid constructor method.",
