@@ -52,6 +52,7 @@ type TagOption struct {
 	IsRequired  bool
 	GoValidator string
 	Default     string
+	Skip        bool
 }
 
 // RenderOptions will render file and out it's content.
@@ -122,12 +123,17 @@ func GetOptionSpec(filePath, optionsStructName, tagName string) (*OptionSpec, []
 	}
 
 	typeParams, fields := findStructTypeParamsAndFields(node, optionsStructName)
-	options := make([]OptionMeta, len(fields))
+	options := make([]OptionMeta, 0, len(fields))
 
 	var warnings []string
 	for idx := range fields {
 		field := fields[idx]
 		fieldName := normalizeName(types.ExprString(field.Type))
+		tagOption, tagWarnings := parseTag(field.Tag, fieldName, tagName)
+
+		if tagOption.Skip {
+			continue
+		}
 
 		if len(field.Names) > 0 {
 			fieldName = field.Names[0].Name
@@ -142,7 +148,6 @@ func GetOptionSpec(filePath, optionsStructName, tagName string) (*OptionSpec, []
 			)
 		}
 
-		tagOption, tagWarnings := parseTag(field.Tag, fieldName, tagName)
 		warnings = append(warnings, tagWarnings...)
 		optMeta := OptionMeta{
 			Name:      cases.Title(language.English, cases.NoLower).String(fieldName),
@@ -163,7 +168,7 @@ func GetOptionSpec(filePath, optionsStructName, tagName string) (*OptionSpec, []
 			}
 		}
 
-		options[idx] = optMeta
+		options = append(options, optMeta)
 	}
 
 	tpSpec, tpString, err := typeParamsStr(typeParams)
@@ -218,6 +223,9 @@ func parseTag(tag *ast.BasicLit, fieldName string, tagName string) (TagOption, [
 					tagOpt.GoValidator += ",required"
 				}
 			}
+
+		case "-":
+			tagOpt.Skip = true
 		}
 	}
 
