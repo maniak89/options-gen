@@ -131,14 +131,15 @@ func GetOptionSpec(filePath, optionsStructName, tagName string, allVariadic bool
 	for idx := range fields {
 		field := fields[idx]
 		fieldName := normalizeName(types.ExprString(field.Type))
+
+		if len(field.Names) > 0 {
+			fieldName = field.Names[0].Name
+		}
+
 		tagOption, tagWarnings := parseTag(field.Tag, fieldName, tagName)
 
 		if tagOption.Skip {
 			continue
-		}
-
-		if len(field.Names) > 0 {
-			fieldName = field.Names[0].Name
 		}
 
 		if isPublic(fieldName) {
